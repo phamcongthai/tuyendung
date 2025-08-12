@@ -1,6 +1,6 @@
 import slugify from 'slugify';
 import { Model } from 'mongoose';
-import { JobsDocument } from '../jobs/jobs.schema';
+import { JobsDocument } from '../modules/jobs/jobs.schema';
 
 export async function generateUniqueSlug(
   model: Model<JobsDocument>,

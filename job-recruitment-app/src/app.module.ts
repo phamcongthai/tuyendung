@@ -4,9 +4,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { RecruiterModule } from './recruiter/recruiter.module';
+import { RecruiterModule } from './modules/recruiters/recruiter.module';
 import { cloudinaryConfig } from './utils/cloudinary.config';
-import { JobsModule } from './jobs/jobs.module';
+import { JobsModule } from './modules/jobs/jobs.module';
 
 @Module({
   imports: [

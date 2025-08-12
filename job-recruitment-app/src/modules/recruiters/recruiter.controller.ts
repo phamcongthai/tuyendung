@@ -18,7 +18,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { RecruiterService } from './recruiter.service';
 import { CreateRecruiterDto } from './dto/create-recruiter.dto';
 import { UpdateRecruiterDto } from './dto/update-recruiter.dto';
-import { multerConfig } from '../utils/multer.config';
+import { multerConfig } from '../../utils/multer.config';
 
 @Controller('admin/recruiters')
 export class RecruiterController {

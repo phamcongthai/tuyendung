@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   Form,
   Input,
@@ -14,6 +14,8 @@ import {
   DatePicker,
   InputNumber,
   Tag,
+  Upload,
+  Image,
 } from 'antd';
 import Swal from 'sweetalert2';
 import {
@@ -30,12 +32,14 @@ import {
   PlusOutlined,
   DeleteOutlined,
 } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
 
-import { createJob } from '../../apis/jobs.api';
+import { fetchJobById, editJob } from '../../apis/jobs.api';
+import { FormSkeleton } from '../../components/Skeleton';
 import { JobsStatus } from '../../types/jobs.enum';
+import type { JobData } from '../../types/jobs.type';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -43,16 +47,50 @@ const { Option } = Select;
 
 dayjs.locale('vi');
 
-const CreateJob: React.FC = () => {
+const EditJob: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
   const [newImages, setNewImages] = useState<File[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const [skillInput, setSkillInput] = useState('');
   const [tagInput, setTagInput] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (id) fetchJobData();
+  }, [id]);
+
+  const fetchJobData = async () => {
+    try {
+      const data = await fetchJobById(id!);
+      setExistingImages(data.images || []);
+      setSkills(data.skills || []);
+      setTags(data.tags || []);
+      
+      // Format data for form
+      const formData = {
+        ...data,
+        deadline: data.deadline ? dayjs(data.deadline) : undefined,
+      };
+      
+      form.setFieldsValue(formData);
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Lỗi!',
+        text: 'Không thể tải thông tin công việc',
+      });
+      navigate('/jobs');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleImageClick = () => {
     fileInputRef.current?.click();
@@ -63,6 +101,10 @@ const CreateJob: React.FC = () => {
     if (files.length > 0) {
       setNewImages(prev => [...prev, ...files]);
     }
+  };
+
+  const removeExistingImage = (index: number) => {
+    setExistingImages(prev => prev.filter((_, i) => i !== index));
   };
 
   const removeNewImage = (index: number) => {
@@ -102,9 +144,7 @@ const CreateJob: React.FC = () => {
         deadline: currentValues.deadline?.toISOString(),
         skills,
         tags,
-        status: JobsStatus.ACTIVE,
-        isActive: true,
-        views: 0,
+        images: existingImages,
       };
 
       // Remove undefined values
@@ -114,19 +154,19 @@ const CreateJob: React.FC = () => {
         }
       });
 
-      await createJob(jobData, newImages.length > 0 ? newImages : undefined);
+      await editJob(id!, jobData, newImages.length > 0 ? newImages : undefined);
       
       Swal.fire({
         icon: 'success',
         title: 'Thành công!',
-        text: 'Tạo công việc thành công',
+        text: 'Cập nhật công việc thành công',
       });
       navigate('/jobs');
     } catch (error: any) {
       Swal.fire({
         icon: 'error',
         title: 'Lỗi!',
-        text: error?.response?.data?.message || 'Tạo công việc thất bại!',
+        text: error?.response?.data?.message || 'Cập nhật thất bại!',
       });
     } finally {
       setSaving(false);
@@ -134,6 +174,8 @@ const CreateJob: React.FC = () => {
   };
 
   const handleCancel = () => navigate('/jobs');
+
+  if (loading) return <FormSkeleton fieldCount={15} />;
 
   return (
     <div style={{ padding: 32, background: '#f5f5f5', minHeight: '100vh', fontFamily: 'Roboto, sans-serif' }}>
@@ -143,7 +185,7 @@ const CreateJob: React.FC = () => {
             <Button icon={<ArrowLeftOutlined />} onClick={handleCancel} style={{ marginRight: 16 }}>
               Quay lại
             </Button>
-            <Title level={3}>Tạo công việc mới</Title>
+            <Title level={3}>Chỉnh sửa công việc</Title>
           </Space>
         </Row>
       </Card>
@@ -262,6 +304,13 @@ const CreateJob: React.FC = () => {
                 <Input placeholder="Nhập địa chỉ chi tiết" />
               </Form.Item>
 
+              <Form.Item name="status" label="Trạng thái" rules={[{ required: true }]}>
+                <Select>
+                  <Option value={JobsStatus.ACTIVE}>Hoạt động</Option>
+                  <Option value={JobsStatus.INACTIVE}>Không hoạt động</Option>
+                </Select>
+              </Form.Item>
+
               <Divider />
 
               <Title level={4}>
@@ -367,7 +416,37 @@ const CreateJob: React.FC = () => {
                 Hình ảnh
               </Title>
 
-              <Form.Item label="Thêm hình ảnh">
+              <Form.Item label="Hình ảnh hiện tại">
+                <div style={{ marginBottom: 16 }}>
+                  <Row gutter={16}>
+                    {existingImages.map((image, index) => (
+                      <Col span={6} key={index}>
+                        <div style={{ position: 'relative' }}>
+                          <Image
+                            src={image}
+                            alt={`Image ${index + 1}`}
+                            style={{ width: '100%', height: 120, objectFit: 'cover', borderRadius: 8 }}
+                          />
+                          <Button
+                            type="text"
+                            danger
+                            icon={<DeleteOutlined />}
+                            style={{
+                              position: 'absolute',
+                              top: 4,
+                              right: 4,
+                              background: 'rgba(255, 255, 255, 0.9)',
+                            }}
+                            onClick={() => removeExistingImage(index)}
+                          />
+                        </div>
+                      </Col>
+                    ))}
+                  </Row>
+                </div>
+              </Form.Item>
+
+              <Form.Item label="Thêm hình ảnh mới">
                 <div style={{ marginBottom: 16 }}>
                   <Button
                     type="dashed"
@@ -427,7 +506,7 @@ const CreateJob: React.FC = () => {
                     icon={<SaveOutlined />}
                     loading={saving}
                   >
-                    {saving ? 'Đang tạo...' : 'Tạo công việc'}
+                    {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
                   </Button>
                 </Space>
               </Form.Item>
@@ -439,4 +518,4 @@ const CreateJob: React.FC = () => {
   );
 };
 
-export default CreateJob;
+export default EditJob;

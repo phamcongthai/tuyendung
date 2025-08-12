@@ -34,12 +34,24 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ collapsed }) => {
     selectedKey = '/';
   }
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', borderRight: '1px solid #f0f0f0' }}>
+    <div style={{ 
+      display: 'flex', 
+      flexDirection: 'column', 
+      height: '100%', 
+      borderRight: '1px solid #f0f0f0',
+      overflow: 'hidden'
+    }}>
       <Menu
         mode="inline"
         theme="light"
         selectedKeys={[selectedKey]}
-        style={{ flex: 1, borderRight: 0, fontSize: 16 }}
+        style={{ 
+          flex: 1, 
+          borderRight: 0, 
+          fontSize: 16,
+          overflowY: 'auto',
+          overflowX: 'hidden'
+        }}
         inlineCollapsed={collapsed}
       >
         {menuItems.map(item => (

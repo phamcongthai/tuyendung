@@ -67,7 +67,7 @@ export const createJob = async (
 
 // Lấy chi tiết 1 job
 export const fetchJobById = async (id: string) => {
-  const res = await axiosInstance.get<JobData>(`/jobs/${id}`);
+  const res = await axiosInstance.get<JobData>(`/admin/jobs/detail/${id}`);
   return res.data;
 };
 
@@ -95,11 +95,11 @@ export const editJob = async (
         formData.append('files', file);
       });
 
-      const res = await axiosInstance.patch<JobData>(`/jobs/${id}`, formData);
+      const res = await axiosInstance.patch<JobData>(`/admin/jobs/edit/${id}`, formData);
       return res.data;
     }
 
-    const res = await axiosInstance.patch<JobData>(`/jobs/${id}`, job, {
+    const res = await axiosInstance.patch<JobData>(`/admin/jobs/edit/${id}`, job, {
       headers: { 'Content-Type': 'application/json' }
     });
     return res.data;
@@ -112,7 +112,7 @@ export const editJob = async (
 
 // Xóa job
 export const deleteJob = async (id: string) => {
-  const res = await axiosInstance.delete<{ message: string }>(`/jobs/${id}`);
+  const res = await axiosInstance.patch<{ message: string }>(`/admin/jobs/delete/${id}`);
   return res.data;
 };
 

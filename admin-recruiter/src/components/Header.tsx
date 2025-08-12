@@ -1,6 +1,8 @@
 import React from 'react';
-import { Layout, Input, Avatar, Badge, Space, Typography } from 'antd';
-import { BellOutlined, MailOutlined, MenuOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
+import { Layout, Input, Avatar, Badge, Space, Typography, Switch } from 'antd';
+import { BellOutlined, MailOutlined, MenuOutlined, SearchOutlined, UserOutlined, BulbOutlined, BulbFilled } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
+import { useTheme } from '../contexts/ThemeContext';
 
 const { Header } = Layout;
 const { Text } = Typography;
@@ -10,7 +12,15 @@ interface AdminHeaderProps {
   setCollapsed: (c: boolean) => void;
 }
 
-const AdminHeader: React.FC<AdminHeaderProps> = ({ collapsed, setCollapsed }) => (
+const AdminHeader: React.FC<AdminHeaderProps> = ({ collapsed, setCollapsed }) => {
+  const navigate = useNavigate();
+  const { isDarkMode, toggleDarkMode } = useTheme();
+
+  const handleAdminClick = () => {
+    navigate('/');
+  };
+
+  return (
   <Header
     style={{
       background: '#fff',
@@ -21,7 +31,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ collapsed, setCollapsed }) =>
       height: 64,
       fontFamily: 'Segoe UI, Roboto, Arial, sans-serif',
       boxShadow: '0 2px 8px #f0f1f2',
-      zIndex: 100,
+      zIndex: 1000,
       position: 'fixed',
       top: 0,
       left: 0,
@@ -35,7 +45,20 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ collapsed, setCollapsed }) =>
         style={{ fontSize: 22, color: '#1677ff', marginRight: 8, cursor: 'pointer', transition: 'transform 0.2s', transform: collapsed ? 'rotate(180deg)' : 'none' }}
         onClick={() => setCollapsed(!collapsed)}
       />
-      <Text strong style={{ fontSize: 22, color: '#1677ff', fontFamily: 'inherit', letterSpacing: 1 }}>
+      <Text 
+        strong 
+        style={{ 
+          fontSize: 22, 
+          color: '#1677ff', 
+          fontFamily: 'inherit', 
+          letterSpacing: 1,
+          cursor: 'pointer',
+          transition: 'color 0.2s'
+        }}
+        onClick={handleAdminClick}
+        onMouseEnter={(e) => e.currentTarget.style.color = '#0958d9'}
+        onMouseLeave={(e) => e.currentTarget.style.color = '#1677ff'}
+      >
         Admin
       </Text>
     </div>
@@ -48,8 +71,17 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ collapsed, setCollapsed }) =>
         allowClear
       />
     </div>
-    {/* Notification, user */}
+    {/* Dark mode toggle, notification, user */}
     <Space size={24} style={{ marginLeft: 24 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        {isDarkMode ? <BulbFilled style={{ fontSize: 18, color: '#faad14' }} /> : <BulbOutlined style={{ fontSize: 18, color: '#666' }} />}
+        <Switch
+          checked={isDarkMode}
+          onChange={toggleDarkMode}
+          size="small"
+          style={{ marginLeft: 4 }}
+        />
+      </div>
       <Badge count={4} size="small">
         <BellOutlined style={{ fontSize: 20, color: '#444' }} />
       </Badge>
@@ -62,6 +94,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ collapsed, setCollapsed }) =>
       </Space>
     </Space>
   </Header>
-);
+  );
+};
 
 export default AdminHeader; 

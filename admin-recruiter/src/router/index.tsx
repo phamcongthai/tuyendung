@@ -8,6 +8,7 @@ import EditRecruiter from '../pages/Recruiters/EditRecruiter';
 import JobsList from '../pages/Jobs/index'
 import CreateJob from './../pages/Jobs/CreateJob';
 import JobDetail from '../pages/Jobs/JobDetail';
+import EditJob from '../pages/Jobs/EditJob';
 const AppRouter = () => {
   console.log('AppRouter rendered, current pathname:', window.location.pathname);
   return (
@@ -21,6 +22,7 @@ const AppRouter = () => {
       <Route path='/jobs' element={<JobsList/>}/>
       <Route path="/jobs/create" element={<CreateJob />} />
       <Route path="/jobs/detail/:id" element={<JobDetail />} />
+      <Route path="/jobs/edit/:id" element={<EditJob />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
