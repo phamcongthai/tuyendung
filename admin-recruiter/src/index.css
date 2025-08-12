@@ -1,0 +1,8 @@
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  /* XÓA những dòng sau vì gây lỗi layout */
+  /* display: flex; */
+  /* place-items: center; */
+}

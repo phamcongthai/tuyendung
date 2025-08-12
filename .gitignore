@@ -1,0 +1,11 @@
+node_modules
+# Ví dụ cho Node.js
+node_modules/
+dist/
+build/
+
+# Nếu bạn dùng VSCode
+.vscode/
+
+# Các file log
+*.log
