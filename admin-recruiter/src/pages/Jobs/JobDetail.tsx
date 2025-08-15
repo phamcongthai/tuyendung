@@ -93,8 +93,8 @@ const JobDetail: React.FC = () => {
     });
   };
 
-  const formatSalary = (min?: number, max?: number, type?: string) => {
-    if (!min && !max) return 'Thỏa thuận';
+  const formatSalary = (min?: number, max?: number, type?: string, negotiable?: boolean) => {
+    if (negotiable || (!min && !max)) return 'Thỏa thuận';
     const fmt = (v: number) => v.toLocaleString('vi-VN');
     return `${min ? fmt(min) : ''}${max ? ` - ${fmt(max)}` : ''} ${type || ''}`.trim();
   };
@@ -270,10 +270,12 @@ const JobDetail: React.FC = () => {
               </Descriptions.Item>
               <Descriptions.Item label="Mức lương">
                 <DollarOutlined style={{ color: '#52c41a', marginRight: 4 }} />
-                {formatSalary(jobData.salaryMin, jobData.salaryMax, jobData.salaryType)}
+                {formatSalary(jobData.salaryMin, jobData.salaryMax, jobData.salaryType, (jobData as any).salaryNegotiable)}
               </Descriptions.Item>
               <Descriptions.Item label="Ngành nghề">
-                {jobData.career || '-'}
+                {jobData.categoryId && (jobData as any).categoryId?.title
+                  ? (jobData as any).categoryId.title
+                  : jobData.career || '-'}
               </Descriptions.Item>
               <Descriptions.Item label="Cấp bậc">
                 {jobData.level || '-'}

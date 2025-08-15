@@ -1,20 +1,24 @@
 // src/main.ts
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { cloudinaryConfig } from './utils/cloudinary.config'; // ✅ gọi config
+import { cloudinaryConfig } from './utils/cloudinary.config';
 import * as dotenv from 'dotenv';
 
 async function bootstrap() {
-  dotenv.config(); // ✅ Load biến môi trường từ .env
+  dotenv.config(); // Load biến môi trường từ .env
 
-  // ✅ Khởi tạo Cloudinary trước khi app chạy
+  // Khởi tạo Cloudinary trước khi app chạy
   cloudinaryConfig();
 
   const app = await NestFactory.create(AppModule);
 
-  // ✅ Cho phép CORS từ FE
+  // Cấu hình CORS linh hoạt
   app.enableCors({
-    origin: 'http://localhost:5173', // hoặc domain FE thực tế
+    origin: (origin, callback) => {
+      // Cho phép request từ bất kỳ origin nào trong môi trường dev
+      if (!origin) return callback(null, true); 
+      return callback(null, true);
+    },
     credentials: true,
   });
 

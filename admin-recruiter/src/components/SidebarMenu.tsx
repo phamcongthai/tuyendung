@@ -20,6 +20,7 @@ const menuItems = [
   { key: '/', icon: <HomeOutlined />, label: 'Dashboard', path: '/' },
   { key: '/recruiters', icon: <BankOutlined />, label: 'Nhà tuyển dụng', path: '/recruiters' },
   { key: '/jobs', icon: <FileTextOutlined />, label: 'Tin tuyển dụng', path: '/jobs' },
+  { key: '/job-categories', icon: <CalendarOutlined />, label: 'Danh mục công việc', path: '/job-categories' },
 ];
 
 const SidebarMenu: React.FC<SidebarMenuProps> = ({ collapsed }) => {
@@ -30,6 +31,8 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ collapsed }) => {
     selectedKey = '/recruiters';
   } else if (location.pathname.startsWith('/jobs')) {
     selectedKey = '/jobs';
+  } else if (location.pathname.startsWith('/job-categories')) {
+    selectedKey = '/job-categories';
   } else if (location.pathname === '/') {
     selectedKey = '/';
   }

@@ -141,11 +141,13 @@ export default function JobList() {
     },
     {
       title: 'Ngành nghề',
-      dataIndex: 'career',
-      width: 140,
+      dataIndex: 'categoryId',
+      width: 160,
       ellipsis: true,
-      render: (text: string) => (
-        <span style={{ fontFamily: 'Roboto, sans-serif' }}>{text || '-'}</span>
+      render: (_: any, record: JobData) => (
+        <span style={{ fontFamily: 'Roboto, sans-serif' }}>
+          {(record as any)?.categoryId?.title || record.career || '-'}
+        </span>
       ),
     },
     {

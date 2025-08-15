@@ -10,7 +10,7 @@ import {
   ArrayUnique,
 } from 'class-validator';
 import { Types } from 'mongoose';
-import { JobsStatus } from '../jobs.schema';
+import { JobsStatus } from '../../jobs.schema';
 
 export class CreateJobDto {
   @IsString()
@@ -48,8 +48,16 @@ export class CreateJobDto {
   salaryType?: string;
 
   @IsOptional()
+  @IsBoolean()
+  salaryNegotiable?: boolean;
+
+  @IsOptional()
   @IsString()
   career?: string;
+
+  @IsOptional()
+  @IsString()
+  categoryId?: string;
 
   @IsOptional()
   @IsString()

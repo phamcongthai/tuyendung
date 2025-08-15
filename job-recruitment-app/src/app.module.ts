@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 import { RecruiterModule } from './modules/recruiters/recruiter.module';
 import { cloudinaryConfig } from './utils/cloudinary.config';
 import { JobsModule } from './modules/jobs/jobs.module';
+import { JobCategoriesModule } from './modules/job-categories/job-categories.module';
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { JobsModule } from './modules/jobs/jobs.module';
       inject: [ConfigService],
     }),
     RecruiterModule,
-    JobsModule
+    JobsModule,
+    JobCategoriesModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -10,11 +10,11 @@ import {
   Patch
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { JobsService } from './jobs.service';
-import { CreateJobDto } from './dto/create-job.dto';
-import { UpdateJobDto } from './dto/update-job.dto';
+import { JobsService } from '../jobs.service';
+import { CreateJobDto } from '../dto/request/create-job.dto';
+import { UpdateJobDto } from '../dto/request/update-job.dto';
 @Controller('admin/jobs')
-export class JobsController {
+export class AdminJobsController {
   constructor(private readonly jobsService: JobsService) {}
   //[GET] : /admin
   @Get()
@@ -37,7 +37,7 @@ export class JobsController {
   }
 
   //[PATCH] : /admin/:id
-  @Patch(':id')
+  @Patch('edit/:id')
   @UseInterceptors(FilesInterceptor('files'))
   async update(
     @Param('id') id: string,

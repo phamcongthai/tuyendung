@@ -118,6 +118,6 @@ export const deleteJob = async (id: string) => {
 
 // Toggle trạng thái active/inactive
 export const toggleJobStatus = async (id: string) => {
-  const res = await axiosInstance.patch<JobData>(`/jobs/toggle-status/${id}`);
+  const res = await axiosInstance.patch<JobData>(`/admin/jobs/toggle-status/${id}`);
   return res.data;
 };

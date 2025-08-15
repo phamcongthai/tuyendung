@@ -37,8 +37,14 @@ export class Jobs {
   @Prop()
   salaryType: string;
 
+  @Prop({ default: false })
+  salaryNegotiable: boolean;
+
   @Prop()
   career: string;
+
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'JobCategories' })
+  categoryId: MongooseSchema.Types.ObjectId;
 
   @Prop()
   level: string;

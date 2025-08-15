@@ -16,6 +16,7 @@ import {
   Tag,
   Upload,
   Image,
+  Switch,
 } from 'antd';
 import Swal from 'sweetalert2';
 import {
@@ -37,6 +38,8 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
 
 import { fetchJobById, editJob } from '../../apis/jobs.api';
+import { fetchJobCategories } from '../../apis/job-categories.api';
+import type { JobCategoryData } from '../../types/job-categories.type';
 import { FormSkeleton } from '../../components/Skeleton';
 import { JobsStatus } from '../../types/jobs.enum';
 import type { JobData } from '../../types/jobs.type';
@@ -61,9 +64,25 @@ const EditJob: React.FC = () => {
   const [skillInput, setSkillInput] = useState('');
   const [tagInput, setTagInput] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [categories, setCategories] = useState<JobCategoryData[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+  const salaryNegotiable = Form.useWatch('salaryNegotiable', form);
 
   useEffect(() => {
     if (id) fetchJobData();
+    const loadCategories = async () => {
+      try {
+        setLoadingCategories(true);
+        const res = await fetchJobCategories({ page: 1, limit: 1000, status: 'active' });
+        setCategories(res.data || []);
+      } catch (err) {
+        message.error('Không thể tải danh sách ngành nghề');
+        setCategories([]);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+    loadCategories();
   }, [id]);
 
   const fetchJobData = async () => {
@@ -76,6 +95,8 @@ const EditJob: React.FC = () => {
       // Format data for form
       const formData = {
         ...data,
+        // Nếu backend populate categoryId thành object, map về _id để Select nhận đúng value
+        categoryId: (data as any)?.categoryId?._id || (data as any)?.categoryId || undefined,
         deadline: data.deadline ? dayjs(data.deadline) : undefined,
       };
       
@@ -154,6 +175,13 @@ const EditJob: React.FC = () => {
         }
       });
 
+      // If salary negotiable, clear numeric salary fields before submit
+      if (jobData.salaryNegotiable) {
+        delete jobData.salaryMin;
+        delete jobData.salaryMax;
+        delete jobData.salaryType;
+      }
+
       await editJob(id!, jobData, newImages.length > 0 ? newImages : undefined);
       
       Swal.fire({
@@ -224,8 +252,18 @@ const EditJob: React.FC = () => {
 
               <Row gutter={16}>
                 <Col span={8}>
-                  <Form.Item name="career" label="Ngành nghề">
-                    <Input placeholder="Ví dụ: Công nghệ thông tin" />
+                  <Form.Item name="categoryId" label="Ngành nghề">
+                    <Select
+                      placeholder="Chọn ngành nghề"
+                      loading={loadingCategories}
+                      showSearch
+                      optionFilterProp="children"
+                      allowClear
+                    >
+                      {categories.map((c) => (
+                        <Option key={c._id} value={c._id}>{c.title}</Option>
+                      ))}
+                    </Select>
                   </Form.Item>
                 </Col>
                 <Col span={8}>
@@ -255,11 +293,20 @@ const EditJob: React.FC = () => {
 
               <Row gutter={16}>
                 <Col span={8}>
+                  <Form.Item name="salaryNegotiable" label="Lương thỏa thuận" valuePropName="checked" initialValue={false}>
+                    <Switch />
+                  </Form.Item>
+                </Col>
+              </Row>
+
+              <Row gutter={16}>
+                <Col span={8}>
                   <Form.Item name="salaryMin" label="Lương tối thiểu">
                     <InputNumber
                       min={0}
                       placeholder="Lương tối thiểu"
                       style={{ width: '100%' }}
+                      disabled={salaryNegotiable}
                     />
                   </Form.Item>
                 </Col>
@@ -269,12 +316,13 @@ const EditJob: React.FC = () => {
                       min={0}
                       placeholder="Lương tối đa"
                       style={{ width: '100%' }}
+                      disabled={salaryNegotiable}
                     />
                   </Form.Item>
                 </Col>
                 <Col span={8}>
                   <Form.Item name="salaryType" label="Đơn vị lương">
-                    <Select placeholder="Chọn đơn vị">
+                    <Select placeholder="Chọn đơn vị" disabled={salaryNegotiable}>
                       <Option value="VND">VND</Option>
                       <Option value="USD">USD</Option>
                       <Option value="EUR">EUR</Option>

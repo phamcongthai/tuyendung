@@ -12,12 +12,14 @@ export interface JobData {
   salaryMin?: number;
   salaryMax?: number;
   salaryType?: string;
+  salaryNegotiable?: boolean;
   career?: string;
+  categoryId?: string; 
   level?: string;
   jobType?: string;
   location?: string;
   address?: string;
-  deadline?: string; // ISO date string
+  deadline?: string; 
   isActive: boolean;
   status: JobsStatus;
   reasonReject?: string;

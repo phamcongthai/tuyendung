@@ -8,7 +8,7 @@ import {
   IsArray,
   ArrayUnique,
 } from 'class-validator';
-import { JobsStatus } from '../jobs.schema';
+import { JobsStatus } from '../../jobs.schema';
 
 export class UpdateJobDto {
   @IsOptional()
@@ -48,8 +48,16 @@ export class UpdateJobDto {
   salaryType?: string;
 
   @IsOptional()
+  @IsBoolean()
+  salaryNegotiable?: boolean;
+
+  @IsOptional()
   @IsString()
   career?: string;
+
+  @IsOptional()
+  @IsString()
+  categoryId?: string;
 
   @IsOptional()
   @IsString()

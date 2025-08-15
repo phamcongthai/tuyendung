@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Form,
   Input,
@@ -14,17 +14,14 @@ import {
   DatePicker,
   InputNumber,
   Tag,
+  Switch,
 } from 'antd';
 import Swal from 'sweetalert2';
 import {
   ArrowLeftOutlined,
   SaveOutlined,
   RiseOutlined,
-  DollarOutlined,
-  EnvironmentOutlined,
-  TeamOutlined,
   FileTextOutlined,
-  TrophyOutlined,
   TagsOutlined,
   PictureOutlined,
   PlusOutlined,
@@ -35,9 +32,11 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
 
 import { createJob } from '../../apis/jobs.api';
+import { fetchJobCategories } from '../../apis/job-categories.api';
+import type { JobCategoryData } from '../../types/job-categories.type';
 import { JobsStatus } from '../../types/jobs.enum';
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
 
@@ -52,7 +51,10 @@ const CreateJob: React.FC = () => {
   const [tags, setTags] = useState<string[]>([]);
   const [skillInput, setSkillInput] = useState('');
   const [tagInput, setTagInput] = useState('');
+  const [categories, setCategories] = useState<JobCategoryData[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const salaryNegotiable = Form.useWatch('salaryNegotiable', form);
 
   const handleImageClick = () => {
     fileInputRef.current?.click();
@@ -64,6 +66,22 @@ const CreateJob: React.FC = () => {
       setNewImages(prev => [...prev, ...files]);
     }
   };
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        setLoadingCategories(true);
+        const res = await fetchJobCategories({ page: 1, limit: 1000, status: 'active' });
+        setCategories(res.data || []);
+      } catch (err) {
+        message.error('Không thể tải danh sách ngành nghề');
+        setCategories([]);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+    loadCategories();
+  }, []);
 
   const removeNewImage = (index: number) => {
     setNewImages(prev => prev.filter((_, i) => i !== index));
@@ -113,6 +131,13 @@ const CreateJob: React.FC = () => {
           delete jobData[key];
         }
       });
+
+      // If salary negotiable, clear numeric salary fields before submit
+      if (jobData.salaryNegotiable) {
+        delete jobData.salaryMin;
+        delete jobData.salaryMax;
+        delete jobData.salaryType;
+      }
 
       await createJob(jobData, newImages.length > 0 ? newImages : undefined);
       
@@ -182,8 +207,18 @@ const CreateJob: React.FC = () => {
 
               <Row gutter={16}>
                 <Col span={8}>
-                  <Form.Item name="career" label="Ngành nghề">
-                    <Input placeholder="Ví dụ: Công nghệ thông tin" />
+                  <Form.Item name="categoryId" label="Ngành nghề">
+                    <Select
+                      placeholder="Chọn ngành nghề"
+                      loading={loadingCategories}
+                      showSearch
+                      optionFilterProp="children"
+                      allowClear
+                    >
+                      {categories.map((c) => (
+                        <Option key={c._id} value={c._id}>{c.title}</Option>
+                      ))}
+                    </Select>
                   </Form.Item>
                 </Col>
                 <Col span={8}>
@@ -213,11 +248,20 @@ const CreateJob: React.FC = () => {
 
               <Row gutter={16}>
                 <Col span={8}>
+                  <Form.Item name="salaryNegotiable" label="Lương thỏa thuận" valuePropName="checked" initialValue={false}>
+                    <Switch />
+                  </Form.Item>
+                </Col>
+              </Row>
+
+              <Row gutter={16}>
+                <Col span={8}>
                   <Form.Item name="salaryMin" label="Lương tối thiểu">
                     <InputNumber
                       min={0}
                       placeholder="Lương tối thiểu"
                       style={{ width: '100%' }}
+                      disabled={salaryNegotiable}
                     />
                   </Form.Item>
                 </Col>
@@ -227,12 +271,13 @@ const CreateJob: React.FC = () => {
                       min={0}
                       placeholder="Lương tối đa"
                       style={{ width: '100%' }}
+                      disabled={salaryNegotiable}
                     />
                   </Form.Item>
                 </Col>
                 <Col span={8}>
                   <Form.Item name="salaryType" label="Đơn vị lương">
-                    <Select placeholder="Chọn đơn vị">
+                    <Select placeholder="Chọn đơn vị" disabled={salaryNegotiable}>
                       <Option value="VND">VND</Option>
                       <Option value="USD">USD</Option>
                       <Option value="EUR">EUR</Option>

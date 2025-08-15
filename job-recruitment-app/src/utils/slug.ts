@@ -1,9 +1,8 @@
 import slugify from 'slugify';
-import { Model } from 'mongoose';
-import { JobsDocument } from '../modules/jobs/jobs.schema';
+import { Model, Document } from 'mongoose';
 
-export async function generateUniqueSlug(
-  model: Model<JobsDocument>,
+export async function generateUniqueSlug<T extends Document>(
+  model: Model<T>,
   title: string,
   currentId?: string
 ): Promise<string> {

@@ -61,7 +61,9 @@ body {
 }
 
 .dark-mode .ant-layout-footer {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
+  background: #1f1f1f !important;
+  color: #bfbfbf !important;
+  border-top: 1px solid var(--border-color) !important;
 }
 
 .dark-mode .ant-menu {
