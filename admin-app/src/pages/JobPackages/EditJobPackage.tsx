@@ -73,47 +73,17 @@ const EditJobPackage: React.FC = () => {
       </Card>
       <Card loading={loading}>
         <Form form={form} layout="vertical" onFinish={onFinish}>
-          <Form.Item name="packageName" label="Tên gói" rules={[{ required: true, message: 'Nhập tên gói' }]}>
+          <Form.Item name="packageName" label="Tên gói (nổi bật)" rules={[{ required: true, message: 'Nhập tên gói' }]}>
             <Input />
           </Form.Item>
           <Form.Item name="price" label="Giá (VND)">
             <InputNumber min={0} style={{ width: '100%' }} />
           </Form.Item>
-          <Form.Item name="durationDays" label="Thời hạn (ngày)">
+          <Form.Item name="durationDays" label="Thời hạn hiển thị (ngày)">
             <InputNumber min={1} style={{ width: '100%' }} />
-          </Form.Item>
-          <Form.Item name="priorityLevel" label="Độ ưu tiên">
-            <InputNumber min={0} style={{ width: '100%' }} />
           </Form.Item>
           <Form.Item name="isActive" label="Kích hoạt" valuePropName="checked">
             <Switch />
-          </Form.Item>
-
-          <Title level={5}>Tính năng</Title>
-          <Form.Item name="jobPostLimit" label="Giới hạn số tin">
-            <InputNumber min={0} style={{ width: '100%' }} />
-          </Form.Item>
-          <Form.Item name="autoApprove" label="Tự duyệt" valuePropName="checked">
-            <Switch />
-          </Form.Item>
-          <Form.Item name="highlight" label="Highlight" valuePropName="checked">
-            <Switch />
-          </Form.Item>
-          <Form.Item name="showOnHomepage" label="Hiển thị Trang chủ" valuePropName="checked">
-            <Switch />
-          </Form.Item>
-          <Form.Item name="analyticsAccess" label="Truy cập Analytics" valuePropName="checked">
-            <Switch />
-          </Form.Item>
-          <Form.Item name="supportLevel" label="Mức hỗ trợ">
-            <Select
-              options={[
-                { value: 'none', label: 'None' },
-                { value: 'email', label: 'Email' },
-                { value: 'hotline', label: 'Hotline' },
-                { value: 'priority', label: 'Priority' },
-              ]}
-            />
           </Form.Item>
 
           <Form.Item>
@@ -129,6 +99,7 @@ const EditJobPackage: React.FC = () => {
 };
 
 export default EditJobPackage;
+
 
 
 
