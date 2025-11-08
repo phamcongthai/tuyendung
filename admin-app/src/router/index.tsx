@@ -29,6 +29,9 @@ import CreateBannerPackage from '../pages/BannerPackages/CreateBannerPackage';
 import EditBannerPackage from '../pages/BannerPackages/EditBannerPackage';
 import PendingOrders from '../pages/BannerPackages/PendingOrders';
 import BannersList from '../pages/BannerPackages/BannersList';
+import HollandQuestions from '../pages/Holland/Questions';
+import HollandProfiles from '../pages/Holland/Profiles';
+import HollandResults from '../pages/Holland/Results';
 import MainLayout from '../layouts/MainLayout';
 
 const AppRouter = () => (
@@ -82,6 +85,10 @@ const AppRouter = () => (
       <Route path="/banner-packages/edit/:id" element={<EditBannerPackage />} />
       <Route path="/banner-packages/:id/pending-orders" element={<PendingOrders />} />
       <Route path="/banner-packages/banners" element={<BannersList />} />
+
+      <Route path="/holland/questions" element={<HollandQuestions />} />
+      <Route path="/holland/profiles" element={<HollandProfiles />} />
+      <Route path="/holland/results" element={<HollandResults />} />
     </Route>
 
     <Route path="*" element={<Navigate to="/" replace />} />

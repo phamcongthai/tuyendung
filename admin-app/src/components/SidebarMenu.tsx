@@ -10,6 +10,7 @@ import {
   FileImageOutlined,
   ReadOutlined,
   SettingOutlined,
+  ExperimentOutlined,
 } from '@ant-design/icons';
 
 interface SidebarMenuProps {
@@ -23,6 +24,16 @@ const menuItems = [
   { key: '/job-categories', icon: <CalendarOutlined />, label: 'Danh mục công việc', path: '/job-categories' },
   { key: '/cv-samples', icon: <FileImageOutlined />, label: 'Quản lý mẫu CV', path: '/cv-samples' },
   { key: '/blogs', icon: <ReadOutlined />, label: 'Quản lý blog', path: '/blogs' },
+  { 
+    key: '/holland', 
+    icon: <ExperimentOutlined />, 
+    label: 'Trắc nghiệm Holland',
+    children: [
+      { key: '/holland/questions', label: 'Câu hỏi', path: '/holland/questions' },
+      { key: '/holland/profiles', label: 'Profiles', path: '/holland/profiles' },
+      { key: '/holland/results', label: 'Kết quả', path: '/holland/results' },
+    ]
+  },
   { key: '/job-packages', icon: <FileTextOutlined />, label: 'Gói đăng tin', path: '/job-packages' },
   { key: '/banner-packages', icon: <FileImageOutlined />, label: 'Gói banner', path: '/banner-packages' },
   { key: '/roles', icon: <KeyOutlined />, label: 'Quản lý quyền', path: '/roles' },
@@ -33,6 +44,8 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ collapsed }) => {
   const location = useLocation();
   // Xác định key đang active
   let selectedKey = '/';
+  let openKeys: string[] = [];
+  
   if (location.pathname.startsWith('/accounts')) {
     selectedKey = '/accounts';
   } else if (location.pathname.startsWith('/jobs')) {
@@ -43,6 +56,9 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ collapsed }) => {
     selectedKey = '/cv-samples';
   } else if (location.pathname.startsWith('/blogs')) {
     selectedKey = '/blogs';
+  } else if (location.pathname.startsWith('/holland')) {
+    selectedKey = location.pathname;
+    openKeys = ['/holland'];
   } else if (location.pathname.startsWith('/roles')) {
     selectedKey = '/roles';
   } else if (location.pathname.startsWith('/job-packages')) {
@@ -66,6 +82,7 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ collapsed }) => {
         mode="inline"
         theme="light"
         selectedKeys={[selectedKey]}
+        defaultOpenKeys={openKeys}
         style={{ 
           flex: 1, 
           borderRight: 0, 
@@ -75,11 +92,24 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ collapsed }) => {
         }}
         inlineCollapsed={collapsed}
       >
-        {menuItems.map(item => (
-          <Menu.Item key={item.key} icon={item.icon}>
-            <NavLink to={item.path}>{collapsed ? null : item.label}</NavLink>
-          </Menu.Item>
-        ))}
+        {menuItems.map(item => {
+          if ('children' in item && item.children) {
+            return (
+              <Menu.SubMenu key={item.key} icon={item.icon} title={item.label}>
+                {item.children.map((child: any) => (
+                  <Menu.Item key={child.key}>
+                    <NavLink to={child.path}>{child.label}</NavLink>
+                  </Menu.Item>
+                ))}
+              </Menu.SubMenu>
+            );
+          }
+          return (
+            <Menu.Item key={item.key} icon={item.icon}>
+              <NavLink to={(item as any).path}>{collapsed ? null : item.label}</NavLink>
+            </Menu.Item>
+          );
+        })}
       </Menu>
       <div style={{ padding: collapsed ? 8 : 16, borderTop: '1px solid #f0f0f0', textAlign: 'center' }}>
         {!collapsed && <div style={{ marginBottom: 8, color: '#888' }}>Cần hỗ trợ? Liên hệ ngay!</div>}
